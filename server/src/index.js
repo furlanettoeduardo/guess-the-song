@@ -18,7 +18,8 @@ import {
   fetchPlaylistTracks,
   pickRandomTrack,
 } from "./spotify.js";
-import { normalizeText, similarityPercent, rateLimit } from "./utils.js";
+import { normalizeText, similarityPercent, rateLimitMiddleware } from "./utils.js";
+import { logError, logInfo } from "./logger.js";
 
 const app = express();
 app.use(express.json());
@@ -39,7 +40,7 @@ app.get("/health", (req, res) => {
   res.json({ ok: true });
 });
 
-app.post("/rooms", rateLimit, async (req, res) => {
+app.post("/rooms", rateLimitMiddleware, async (req, res) => {
   const { playlistUrl, hostName } = req.body || {};
   if (!playlistUrl || !hostName) {
     return res.status(400).json({ error: "playlistUrl and hostName required" });
@@ -57,8 +58,15 @@ app.post("/rooms", rateLimit, async (req, res) => {
     }
 
     const room = createRoom({ playlistId, tracks, hostName });
+    logInfo("room created", { roomId: room.id, playlistId });
     return res.json({ roomId: room.id });
   } catch (error) {
+    logError("failed to load playlist", { message: error?.message });
+    if (error?.message?.includes("missing spotify client credentials")) {
+      return res.status(500).json({
+        error: "missing spotify credentials in server/.env",
+      });
+    }
     return res.status(500).json({ error: "failed to load playlist" });
   }
 });
@@ -139,4 +147,5 @@ io.on("connection", (socket) => {
 const port = process.env.PORT || 4000;
 server.listen(port, () => {
   console.log(`server listening on ${port}`);
+  logInfo("server started", { port });
 });

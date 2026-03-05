@@ -53,3 +53,7 @@ export async function rateLimit() {
   }
   lastRequestAt = Date.now();
 }
+
+export function rateLimitMiddleware(req, res, next) {
+  rateLimit().then(next).catch(next);
+}

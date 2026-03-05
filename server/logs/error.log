@@ -1,0 +1,5 @@
+[2026-03-05T15:45:24.687Z] ERROR failed to load playlist {"message":"Request failed with status code 403"}
+[2026-03-05T15:46:58.346Z] ERROR failed to load playlist {"message":"Request failed with status code 403"}
+[2026-03-05T15:46:58.345Z] ERROR spotify playlist fetch failed {"playlistId":"1DUY7G1VL2uL0MJTqIjTFJ","status":403,"data":{"error":{"status":403,"message":"Forbidden"}}}
+[2026-03-05T15:47:12.248Z] ERROR failed to load playlist {"message":"Request failed with status code 403"}
+[2026-03-05T15:47:12.248Z] ERROR spotify playlist fetch failed {"playlistId":"1DUY7G1VL2uL0MJTqIjTFJ","status":403,"data":{"error":{"status":403,"message":"Forbidden"}}}

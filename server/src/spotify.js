@@ -1,5 +1,6 @@
 import axios from "axios";
 import { rateLimit } from "./utils.js";
+import { logError } from "./logger.js";
 
 const tokenState = {
   accessToken: null,
@@ -59,12 +60,20 @@ export async function fetchPlaylistTracks(playlistId) {
 
   while (true) {
     await rateLimit();
-    const response = await spotifyApi.get(`/playlists/${playlistId}/tracks`, {
-      params: { limit, offset },
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+    let response;
+    try {
+      response = await spotifyApi.get(`/playlists/${playlistId}/tracks`, {
+        params: { limit, offset },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+    } catch (error) {
+      const status = error?.response?.status;
+      const data = error?.response?.data;
+      logError("spotify playlist fetch failed", { playlistId, status, data });
+      throw error;
+    }
 
     const items = response.data.items || [];
     for (const item of items) {
